@@ -74,7 +74,6 @@ public class EntityLoader {
         EntityNameExtractor entityNameExtractor = new EntityNameExtractor(field.getGenericType());
         EntityCollectionLoader entityCollectionLoader = new EntityCollectionLoader(jdbcTemplate);
         return entityCollectionLoader.queryWithEagerColumn(persistentClass, id, collectionBindingMap.getCollection(entityNameExtractor.getEntityName()));
-
     }
 
 
