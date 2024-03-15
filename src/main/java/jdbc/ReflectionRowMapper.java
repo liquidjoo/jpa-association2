@@ -3,6 +3,7 @@ package jdbc;
 import hibernate.entity.meta.PersistentClass;
 import hibernate.entity.meta.PersistentCollectionClass;
 import hibernate.entity.meta.column.EntityColumn;
+import hibernate.entity.meta.column.EntityColumns;
 import jakarta.persistence.OneToMany;
 
 import java.lang.reflect.Field;
@@ -27,14 +28,25 @@ public class ReflectionRowMapper<T> implements RowMapper<T> {
         this.persistentCollectionClass = null;
     }
 
+    public ReflectionRowMapper(PersistentCollectionClass<T> persistentCollectionClass) {
+        this.persistentClass = null;
+        this.persistentCollectionClass = persistentCollectionClass;
+    }
+
     @Override
     public T mapRow(final ResultSet resultSet) throws SQLException {
-        T instance = persistentClass.newInstance();
-        List<EntityColumn> entityColumns = persistentClass.getEntityColumns();
-        setEachColumn(entityColumns, instance, resultSet, persistentClass.getEntityName());
 
+        if (persistentClass != null && persistentCollectionClass == null) {
+            T instance = persistentClass.newInstance();
+            List<EntityColumn> entityColumns = persistentClass.getEntityColumns();
+            setEachColumn(entityColumns, instance, resultSet, persistentClass.getEntityName());
+            return instance;
+        }
 
-        if (persistentCollectionClass != null) {
+        if (persistentCollectionClass != null && persistentClass != null) {
+            T instance = persistentClass.newInstance();
+            List<EntityColumn> entityColumns = persistentClass.getEntityColumns();
+            setEachColumn(entityColumns, instance, resultSet, persistentClass.getEntityName());
 
             do {
                 Field field = Arrays.stream(persistentClass.getFields())
@@ -45,13 +57,21 @@ public class ReflectionRowMapper<T> implements RowMapper<T> {
                 Object collectionInstance = persistentCollectionClass.newInstance();
                 List<EntityColumn> values = persistentCollectionClass.getEntityColumns().getValues();
 
-
                 setEachColumn(values, collectionInstance, resultSet, persistentCollectionClass.getCollectionEntityName());
                 addFieldValue(field, instance, collectionInstance);
             } while (resultSet.next());
 
+            return instance;
         }
-        return instance;
+
+        if (persistentClass == null && persistentCollectionClass != null) {
+            T instance = persistentCollectionClass.newInstance();
+            List<EntityColumn> entityColumns = persistentCollectionClass.getEntityColumns().getValues();
+            setEachColumn(entityColumns, instance, resultSet, persistentCollectionClass.getCollectionEntityName());
+            return instance;
+        }
+
+        return null;
     }
 
 

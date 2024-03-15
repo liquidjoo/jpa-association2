@@ -12,17 +12,19 @@ public abstract class AbstractPersistCollection<T> implements Collection<T> {
     protected final EntityCollectionLoader entityCollectionLoader;
     protected Collection<T> values = null;
     protected boolean isLoaded = false;
+    protected boolean lazy = false;
 
-    protected AbstractPersistCollection(final PersistentCollectionClass<T> persistentCollectionClass, final EntityCollectionLoader entityCollectionLoader) {
+    protected AbstractPersistCollection(final PersistentCollectionClass<T> persistentCollectionClass, final EntityCollectionLoader entityCollectionLoader, final boolean lazy) {
         this.persistentCollectionClass = persistentCollectionClass;
         this.entityCollectionLoader = entityCollectionLoader;
+        this.lazy = lazy;
     }
 
     protected void load() {
         if (isLoaded) {
             return;
         }
-        values = entityCollectionLoader.findAll(persistentCollectionClass);
+        values = entityCollectionLoader.findAll(persistentCollectionClass, lazy);
         isLoaded = true;
     }
 

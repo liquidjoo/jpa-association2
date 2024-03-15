@@ -14,6 +14,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -87,7 +88,7 @@ class EntityLoaderTest {
     @Test
     void eager_lazy_join_모두_포함된_entity를_반환한다() {
         CollectionBindingMap collectionBindingMap = new CollectionBindingMap();
-        collectionBindingMap.addCollectionBinding(new PersistentCollectionClass(new PersistentClass<>(Order.class), EagerOrderItem.class));
+        collectionBindingMap.addCollectionBinding(new PersistentCollectionClass(new PersistentClass<>(Order.class), LazyOrderItem.class));
 
         entityLoader = new EntityLoader(jdbcTemplate, collectionBindingMap);
         // given
@@ -102,11 +103,13 @@ class EntityLoaderTest {
         // when
         Order actual = entityLoader.find(new PersistentClass<>(Order.class), 1L);
 
+
+        System.out.println(actual.lazyOrderItems);
         // then
         assertAll(
                 () -> assertThat(actual.id).isEqualTo(1L),
-                () -> assertThat(actual.eagerOrderItems).hasSize(2)
-//                () -> assertThat(actual.lazyOrderItems).hasSize(3)
+//                () -> assertThat(actual.eagerOrderItems).hasSize(2)
+                () -> assertThat(actual.lazyOrderItems).hasSize(3)
         );
     }
 
@@ -161,13 +164,13 @@ class EntityLoaderTest {
 
         private String orderNumber;
 
-        @OneToMany(fetch = FetchType.EAGER)
-        @JoinColumn(name = "orders_id")
-        private List<EagerOrderItem> eagerOrderItems;
+//        @OneToMany(fetch = FetchType.EAGER)
+//        @JoinColumn(name = "orders_id")
+//        private List<EagerOrderItem> eagerOrderItems;
 
-//        @OneToMany(fetch = FetchType.LAZY)
-//        @JoinColumn(name = "lazy_order_id")
-//        private List<LazyOrderItem> lazyOrderItems;
+        @OneToMany(fetch = FetchType.LAZY)
+        @JoinColumn(name = "lazy_order_id")
+        private List<LazyOrderItem> lazyOrderItems;
     }
 
 
@@ -185,7 +188,7 @@ class EntityLoaderTest {
     }
 
     @Entity
-    @Table(name = "order_items")
+    @Table(name = "lazy_order_items")
     static class LazyOrderItem {
 
         @Id

@@ -9,8 +9,8 @@ import java.util.ListIterator;
 
 public class PersistentList<T> extends AbstractPersistCollection<T> implements List<T> {
 
-    public PersistentList(final PersistentCollectionClass<T> persistentCollectionClass, final EntityCollectionLoader entityCollectionLoader) {
-        super(persistentCollectionClass, entityCollectionLoader);
+    public PersistentList(final PersistentCollectionClass<T> persistentCollectionClass, final EntityCollectionLoader entityCollectionLoader, final boolean lazy) {
+        super(persistentCollectionClass, entityCollectionLoader, lazy);
     }
 
     @Override
