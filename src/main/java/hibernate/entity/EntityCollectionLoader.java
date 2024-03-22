@@ -11,12 +11,8 @@ import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.LazyLoader;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 public class EntityCollectionLoader {
 
@@ -37,37 +33,16 @@ public class EntityCollectionLoader {
     }
 
     public <T> T queryWithEagerColumn(PersistentClass<T> persistentClass, Object id, PersistentCollectionClass collectionClass) {
-        final String query = selectQueryBuilder.generateQuery(
-                persistentClass.getEntityName(),
-                persistentClass.getFieldNames(),
-                persistentClass.getEntityId(),
-                id,
-                true,
-                collectionClass.getCollectionEntityName(),
-                collectionClass.getEntityColumns().getFieldNames()
-        );
+        final String query = selectQueryBuilder.generateQuery(persistentClass.getEntityName(), persistentClass.getFieldNames(), persistentClass.getEntityId(), id, true, collectionClass.getCollectionEntityName(), collectionClass.getEntityColumns().getFieldNames());
         return jdbcTemplate.queryForObject(query, new ReflectionRowMapper<T>(persistentClass, collectionClass));
     }
 
-
-    private <T> T queryOnlyEntity(final PersistentCollectionClass<T> persistentCollectionClass, Object id) {
-        final String query = selectQueryBuilder.generateQuery(
-                persistentCollectionClass.getCollectionEntityName(),
-                persistentCollectionClass.getEntityColumns().getFieldNames(),
-                persistentCollectionClass.getEntityColumns().getEntityId(),
-                id
-        );
-        return (T) jdbcTemplate.queryForObject(query, new ReflectionRowMapper<>(persistentCollectionClass.getOwner(), persistentCollectionClass));
-    }
 
     public <T> T lazyJoinColumns(PersistentCollectionClass persistentCollectionClass, T instance) {
 
         PersistentClass owner = persistentCollectionClass.getOwner();
 
-        Field field = Arrays.stream(owner.getFields())
-                .filter(it -> it.isAnnotationPresent(OneToMany.class))
-                .findAny()
-                .orElseThrow();
+        Field field = Arrays.stream(owner.getFields()).filter(it -> it.isAnnotationPresent(OneToMany.class)).findAny().orElseThrow();
 
         Enhancer enhancer = generateEnhancer(persistentCollectionClass);
         addFieldValue(field, instance, enhancer.create());

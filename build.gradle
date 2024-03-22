@@ -16,6 +16,7 @@ dependencies {
     implementation 'cglib:cglib:3.3.0'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.3'
     testImplementation 'org.assertj:assertj-core:3.24.2'
+    implementation 'org.hibernate:hibernate-core:5.6.15.Final'
 }
 
 test {

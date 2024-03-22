@@ -3,7 +3,6 @@ package jdbc;
 import hibernate.entity.meta.PersistentClass;
 import hibernate.entity.meta.PersistentCollectionClass;
 import hibernate.entity.meta.column.EntityColumn;
-import hibernate.entity.meta.column.EntityColumns;
 import jakarta.persistence.OneToMany;
 
 import java.lang.reflect.Field;

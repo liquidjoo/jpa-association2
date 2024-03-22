@@ -3,11 +3,11 @@ package hibernate.entity.meta;
 public class DuplicateMappingException extends RuntimeException {
     private final String name;
     private final String type;
+
     public DuplicateMappingException(Type type, String name) {
         this(type.text, name);
     }
 
-    @Deprecated
     public DuplicateMappingException(String type, String name) {
         this("Duplicate " + type + " mapping " + name, type, name);
     }

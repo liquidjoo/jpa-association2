@@ -28,6 +28,7 @@ public class EntityLoader {
         T instance = getInstance(persistentClass, id);
 
         Field[] fields = persistentClass.getFields();
+
         boolean lazy = Arrays.stream(fields)
                 .filter(it -> it.isAnnotationPresent(OneToMany.class))
                 .anyMatch(it -> it.getDeclaredAnnotation(OneToMany.class).fetch() == FetchType.LAZY);
